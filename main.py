@@ -1,7 +1,7 @@
 import discord
 import os
 from dotenv import load_dotenv
-from discord.ext import tasks
+from discord.ext import tasks, commands
 from datetime import datetime
 from utils import get_slot_details, filter_response
 
@@ -21,6 +21,14 @@ async def on_ready():
     send_embed.start()
 
 
+@client.event
+async def on_message(message):
+    if message.author == client.user:
+        return
+    if message.content.startswith('_ping'):
+        await message.channel.send(f'Pong! `{round(client.latency * 1000)}ms`')
+
+
 @tasks.loop(minutes=5)
 async def send_embed():
     response, failed = get_slot_details(district_id=DISTRICT_ID)
@@ -33,6 +41,7 @@ async def send_embed():
 
     channel = client.get_channel(id=int(CHANNEL_ID))
     centers = filter_response(response=response, min_age=MIN_AGE)
+    print(f"{datetime.utcnow()} - Centers available: {len(centers)}")
     for obj in centers:
         title = f"{obj['name']} ({obj['block_name']})"
         desc = (
