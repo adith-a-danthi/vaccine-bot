@@ -23,3 +23,28 @@ def get_slot_details(district_id):
         response = None
         failed = True
     return (response, failed)
+
+
+def filter_response(response, min_age):
+    result = []
+
+    centers = response['centers']
+    for center in centers:
+
+        sessions = center['sessions']
+        for session in sessions:
+            if session['min_age_limit'] == int(min_age) and session['available_capacity'] > 0:
+                result_object = {
+                    'name': center['name'],
+                    'pincode': center['pincode'],
+                    'district': center['district_name'],
+                    'block_name': center['block_name'],
+                    'fee_type': center['fee_type'],
+                    'date': session['date'],
+                    'vaccine': session['vaccine'],
+                    'available_capacity': session['available_capacity']
+                }
+
+                result.append(result_object)
+
+    return result
